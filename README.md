@@ -1,9 +1,15 @@
 # CoinFlipper
 A Kotlin (Ktor) API to generate random coin flips
 
-Run the app using gradle or in the IDE. To flip a coin in the terminal (or browser) enter 
+Run the app using gradle 
+```
+./gradlew run
+```
 
-```curl localhost:8080/flip
+or in the IDE. To flip a coin in the terminal (or browser) enter 
+
+```
+curl localhost:8080/flip
 {"face":"HEADS"}
 
 curl localhost:8080/flip
