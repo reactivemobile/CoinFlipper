@@ -1,5 +1,5 @@
 # CoinFlipper
-A Kotlin (Ktor) API to generate random coin flips
+An API built in Kotlin using[Ktor](http://ktor.io)and[exposed](https://github.com/JetBrains/Exposed)to generate random coin flips.
 
 Run the app using gradle 
 ```
