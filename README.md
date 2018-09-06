@@ -1,2 +1,2 @@
 # CoinFlipper
-A Kotlin API to generate random coin flips
+A Kotlin (Ktor) API to generate random coin flips
