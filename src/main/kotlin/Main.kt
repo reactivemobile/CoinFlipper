@@ -17,11 +17,14 @@ import java.security.SecureRandom
 
 fun main(args: Array<String>) {
     val secureRandom = SecureRandom()
+    val booleanRandomiser = { secureRandom.nextBoolean() }
 
     val server = embeddedServer(Netty, port = 8080) {
 
         install(ContentNegotiation) {
-            gson { }
+            gson {
+                setPrettyPrinting()
+            }
         }
 
         install(CallLogging) {
@@ -30,7 +33,7 @@ fun main(args: Array<String>) {
 
         routing {
             get("/flip") {
-                handleRootRequest(secureRandom)
+                handleRootRequest(booleanRandomiser)
             }
 
             get("/outcomes") {
@@ -45,16 +48,16 @@ fun main(args: Array<String>) {
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.handleGetOutcomesRequest() {
-    var all: List<Coin> = ArrayList()
+    var allOutcomes: List<Coin> = ArrayList()
     transaction {
-        all = RESULTS.selectAll().map { resultRow -> Coin(Face.valueOf(resultRow[RESULTS.face].toString())) }
+        allOutcomes = RESULTS.selectAll().map { resultRow -> Coin(Face.valueOf(resultRow[RESULTS.face].toString())) }
     }.apply {
-        call.respond(all)
+        call.respond(allOutcomes)
     }
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.handleRootRequest(secureRandom: SecureRandom) {
-    val result = secureRandom.nextBoolean()
+private suspend fun PipelineContext<Unit, ApplicationCall>.handleRootRequest(booleanRandomiser: () -> Boolean) {
+    val result = booleanRandomiser.invoke()
     val faceValue: Face = if (result) Face.HEADS else Face.TAILS
     transaction {
         RESULTS.insert { it[face] = faceValue.name }
