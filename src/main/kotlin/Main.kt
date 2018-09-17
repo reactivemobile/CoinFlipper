@@ -33,7 +33,7 @@ fun main(args: Array<String>) {
 
         routing {
             get("/flip") {
-                handleRootRequest(booleanRandomiser)
+                handleFlipRequest(booleanRandomiser)
             }
 
             get("/outcomes") {
@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
     server.start(wait = true)
 }
 
-suspend fun PipelineContext<Unit, ApplicationCall>.handleGetOutcomesRequest() {
+private suspend fun PipelineContext<Unit, ApplicationCall>.handleGetOutcomesRequest() {
     var allOutcomes: List<Coin> = ArrayList()
     transaction {
         allOutcomes = RESULTS.selectAll().map { resultRow -> Coin(Face.valueOf(resultRow[RESULTS.face].toString())) }
@@ -56,7 +56,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.handleGetOutcomesRequest() {
     }
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.handleRootRequest(booleanRandomiser: () -> Boolean) {
+private suspend fun PipelineContext<Unit, ApplicationCall>.handleFlipRequest(booleanRandomiser: () -> Boolean) {
     val result = booleanRandomiser.invoke()
     val faceValue: Face = if (result) Face.HEADS else Face.TAILS
     transaction {
@@ -70,6 +70,5 @@ data class Coin(var face: Face)
 enum class Face { HEADS, TAILS }
 
 object RESULTS : org.jetbrains.exposed.sql.Table() {
-    val id = integer("id").primaryKey().autoIncrement()
     val face = varchar("face", 5)
 }
