@@ -1,12 +1,16 @@
-import io.ktor.application.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
 import io.ktor.pipeline.PipelineContext
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.response.respond
+import io.ktor.routing.get
+import io.ktor.routing.routing
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import kotlinx.coroutines.experimental.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.insert
@@ -59,10 +63,13 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleGetOutcomesRequ
 private suspend fun PipelineContext<Unit, ApplicationCall>.handleFlipRequest(booleanRandomiser: () -> Boolean) {
     val result = booleanRandomiser.invoke()
     val faceValue: Face = if (result) Face.HEADS else Face.TAILS
-    transaction {
-        RESULTS.insert { it[face] = faceValue.name }
+    runBlocking {
+        transaction {
+            RESULTS.insert { it[face] = faceValue.name }
+        }
+    }.apply {
+        call.respond(Coin(faceValue))
     }
-    call.respond(Coin(faceValue))
 }
 
 data class Coin(var face: Face)
