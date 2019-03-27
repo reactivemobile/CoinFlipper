@@ -4,13 +4,12 @@ import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.gson.gson
-import io.ktor.pipeline.PipelineContext
 import io.ktor.response.respond
 import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import kotlinx.coroutines.experimental.runBlocking
+import io.ktor.util.pipeline.PipelineContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.insert
@@ -19,7 +18,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.event.Level
 import java.security.SecureRandom
 
-fun main(args: Array<String>) {
+fun main() {
     val secureRandom = SecureRandom()
     val booleanRandomiser = { secureRandom.nextBoolean() }
 
@@ -63,7 +62,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleGetOutcomesRequ
 private suspend fun PipelineContext<Unit, ApplicationCall>.handleFlipRequest(booleanRandomiser: () -> Boolean) {
     val result = booleanRandomiser.invoke()
     val faceValue: Face = if (result) Face.HEADS else Face.TAILS
-    runBlocking {
+    run {
         transaction {
             RESULTS.insert { it[face] = faceValue.name }
         }
