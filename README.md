@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/reactivemobile/CoinFlipper.svg?branch=master)](https://travis-ci.com/reactivemobile/CoinFlipper)
+
 # CoinFlipper
 An API built in Kotlin using [Ktor](http://ktor.io) and [exposed](https://github.com/JetBrains/Exposed) to generate random coin flips.
 
